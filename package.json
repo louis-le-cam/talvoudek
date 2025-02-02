@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "tsup ; npx tsc --emitDeclarationOnly --declaration",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "keywords": [
     "validation",
