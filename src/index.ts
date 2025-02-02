@@ -96,7 +96,7 @@ export default function validate<S extends Schema>(
     return value;
   } else if (typeof schema === "number") {
     // @ts-ignore
-    if (value !== schema) {
+    if (value !== schema && !(Number.isNaN(value) && Number.isNaN(schema))) {
       throw new validate.Error(path, schema, value);
     }
 
