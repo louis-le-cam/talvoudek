@@ -1,6 +1,6 @@
 {
   "name": "@louis_le_cam/talvoudek",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "A simple yet powerful data validation library for being safe manipulating data from the outside",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
