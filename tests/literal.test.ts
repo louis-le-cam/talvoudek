@@ -7,7 +7,7 @@ test("good string literal", () => {
 
 test("wrong string literal", () => {
   expect(() => validate("value", "schema"))
-    .toThrow(new validate.Error(["body"], "schema", "value"));
+    .toThrow(new validate.ValidationError(["body"], "schema", "value"));
 });
 
 test("good number literal", () => {
@@ -15,7 +15,7 @@ test("good number literal", () => {
 });
 
 test("wrong number literal", () => {
-  expect(() => validate(42, 89)).toThrow(new validate.Error(["body"], 89, 42));
+  expect(() => validate(42, 89)).toThrow(new validate.ValidationError(["body"], 89, 42));
 });
 
 test("good nan number literal", () => {
@@ -23,11 +23,11 @@ test("good nan number literal", () => {
 });
 
 test("unexpected nan number literal", () => {
-  expect(() => validate(NaN, 3853)).toThrow(new validate.Error(["body"], 3853, NaN));
+  expect(() => validate(NaN, 3853)).toThrow(new validate.ValidationError(["body"], 3853, NaN));
 });
 
 test("expected nan number literal", () => {
-  expect(() => validate(3853, NaN)).toThrow(new validate.Error(["body"], NaN, 3853));
+  expect(() => validate(3853, NaN)).toThrow(new validate.ValidationError(["body"], NaN, 3853));
 });
 
 test("good infinity number literal", () => {
@@ -35,11 +35,11 @@ test("good infinity number literal", () => {
 });
 
 test("unexpected infinity number literal", () => {
-  expect(() => validate(Number.POSITIVE_INFINITY, -82242)).toThrow(new validate.Error(["body"], -82242, Number.POSITIVE_INFINITY));
+  expect(() => validate(Number.POSITIVE_INFINITY, -82242)).toThrow(new validate.ValidationError(["body"], -82242, Number.POSITIVE_INFINITY));
 });
 
 test("expected infinity number literal", () => {
-  expect(() => validate(-82242, Number.POSITIVE_INFINITY)).toThrow(new validate.Error(["body"], Number.POSITIVE_INFINITY, -82242));
+  expect(() => validate(-82242, Number.POSITIVE_INFINITY)).toThrow(new validate.ValidationError(["body"], Number.POSITIVE_INFINITY, -82242));
 });
 
 test("good -infinity number literal", () => {
@@ -47,9 +47,9 @@ test("good -infinity number literal", () => {
 });
 
 test("unexpected -infinity number literal", () => {
-  expect(() => validate(Number.NEGATIVE_INFINITY, -82242)).toThrow(new validate.Error(["body"], -82242, Number.NEGATIVE_INFINITY));
+  expect(() => validate(Number.NEGATIVE_INFINITY, -82242)).toThrow(new validate.ValidationError(["body"], -82242, Number.NEGATIVE_INFINITY));
 });
 
 test("expected -infinity number literal", () => {
-  expect(() => validate(-82242, Number.NEGATIVE_INFINITY)).toThrow(new validate.Error(["body"], Number.NEGATIVE_INFINITY, -82242));
+  expect(() => validate(-82242, Number.NEGATIVE_INFINITY)).toThrow(new validate.ValidationError(["body"], Number.NEGATIVE_INFINITY, -82242));
 });

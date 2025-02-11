@@ -31,7 +31,7 @@ test("wrong object field", () => {
       age: Number,
       role: validate.either("user", "admin")
     },
-  )).toThrow(new validate.Error(["body", "name"], String, null));
+  )).toThrow(new validate.ValidationError(["body", "name"], String, null));
 });
 
 test("missing object field", () => {
@@ -45,7 +45,7 @@ test("missing object field", () => {
       age: Number,
       role: validate.either("user", "admin")
     },
-  )).toThrow(new validate.Error(["body", "name"], String, undefined));
+  )).toThrow(new validate.ValidationError(["body", "name"], String, undefined));
 });
 
 test("extra object field", () => {
@@ -61,7 +61,7 @@ test("extra object field", () => {
       age: Number,
       role: validate.either("user", "admin")
     },
-  )).toThrow(new validate.Error(["body", "extraField"], undefined, null));
+  )).toThrow(new validate.ValidationError(["body", "extraField"], undefined, null));
 });
 
 
