@@ -19,6 +19,25 @@ test("good object", () => {
   });
 });
 
+test("optional field", () => {
+  expect(validate(
+    {
+      name: "test name",
+      age: 26,
+      role: undefined,
+    },
+    {
+      name: String,
+      age: Number,
+      role: validate.either(undefined, "user", "admin")
+    },
+  )).toMatchObject({
+    name: "test name",
+    age: 26,
+    role: undefined,
+  });
+});
+
 test("wrong object field", () => {
   expect(() => validate(
     {

@@ -104,14 +104,14 @@ function validate<S extends validate.Schema>(
       throw new validate.ValidationError(path, schema, value);
     }
 
-    for (const field in schema) {
-      if (!(field in value)) {
-        throw new validate.ValidationError([...path, field], schema[field], undefined);
+    for (const field in value) {
+      if (!(field in schema)) {
+        throw new validate.ValidationError([...path, field], undefined, (value as any)[field]);
       }
     }
 
     // @ts-ignore
-    return Object.fromEntries(Object.entries(value).map(([key, value]) => [key, validate(value, schema[key], [...path, key])]));
+    return Object.fromEntries(Object.entries(schema).map(([key, schema]) => [key, validate((value as any)[key], schema, [...path, key])]));
   } else if (typeof schema === "function") {
     return schema(value, path);
   } else {
