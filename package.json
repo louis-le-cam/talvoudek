@@ -1,6 +1,6 @@
 {
   "name": "@louis_le_cam/talvoudek",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "A simple yet powerful data validation library for being safe manipulating data from the outside",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
