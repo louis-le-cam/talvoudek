@@ -10,7 +10,7 @@
     "./src/"
   ],
   "scripts": {
-    "build": "tsup ; npx tsc --emitDeclarationOnly --declaration",
+    "build": "tsup --cjsInterop ; npx tsc --emitDeclarationOnly --declaration",
     "test": "jest --coverage"
   },
   "keywords": [
