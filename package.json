@@ -10,7 +10,7 @@
     "./src/"
   ],
   "scripts": {
-    "build": "tsup --cjsInterop ; npx tsc --emitDeclarationOnly --declaration",
+    "build": "tsup --cjsInterop ; printf '\nmodule.exports = module.exports.default;' >> dist/index.js ; npx tsc --emitDeclarationOnly --declaration",
     "test": "jest --coverage"
   },
   "keywords": [
