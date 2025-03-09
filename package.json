@@ -1,6 +1,6 @@
 {
   "name": "@louis_le_cam/talvoudek",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "A simple yet powerful data validation library for being safe manipulating data from the outside",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -29,8 +29,14 @@
   },
   "tsup": {
     "platform": "neutral",
-    "entry": ["src/index.ts"],
-    "format": ["cjs", "esm", "iife"],
+    "entry": [
+      "src/index.ts"
+    ],
+    "format": [
+      "cjs",
+      "esm",
+      "iife"
+    ],
     "dts": true,
     "sourcemap": true,
     "clean": true
