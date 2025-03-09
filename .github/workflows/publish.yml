@@ -12,7 +12,7 @@ on:
           - patch
           - minor
           - major
-        
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -24,7 +24,9 @@ jobs:
       - name: Bump package version
         run: npm version --no-commit-hooks --no-git-tag-version ${{github.event.inputs.release_type}}
       - name: Build package
-        run: npm run build
+        run: |
+           npm clean-install
+           npm run build
       - name: Configure git user
         run: |
           git config user.email "${{github.actor}}@users.noreply.github.com"
