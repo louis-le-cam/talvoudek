@@ -236,6 +236,36 @@ namespace validate {
   );
 
   /**
+   * Validate an object using `instanceof` operator
+   *
+   * @example
+   * class Foo {}
+   * class Bar {}
+   *
+   * validate(new Foo(), validate.instanceOf(Foo)); // Ok
+   * validate(new Bar(), validate.instanceOf(Foo)); // Error
+   * validate(null, validate.instanceOf(Foo)); // Error
+   * validate(892, validate.instanceOf(Foo)); // Error
+   */
+  export function instanceOf<
+    C extends { [Symbol.hasInstance]: (instance: unknown) => boolean, name?: string }
+      & (abstract new (...args: any) => any)
+  >(clss: C) {
+    const handler = Object.assign(
+      (value: unknown, path: (string | number)[]): InstanceType<C> => {
+        if (value instanceof clss) {
+          return value;
+        } else {
+          throw new validate.ValidationError(path, handler, value);
+        }
+      },
+      { [validate.customMetadataSymbol]: new validate.CustomMetadata(`instanceOf(${clss.name ?? clss.toString()})`) }
+    );
+
+    return handler;
+  };
+
+  /**
    * Format a field path into a string displayable to end-users
    *
    * The result of this function should be safe to display as long as the field names and indices of the value
