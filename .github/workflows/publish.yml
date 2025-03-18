@@ -48,6 +48,6 @@ jobs:
           git push ${{ inputs.dry_run && '--dry-run' || '' }} --tags origin
           git push ${{ inputs.dry_run && '--dry-run' || '' }}
       - name: Publish to npm
-        run: npm publish ${{ inputs.dry_run && '--dry-run' || '' }} --provenance --access public
+        run: npm publish ${{ inputs.dry_run && '--dry-run' || '' }} --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
