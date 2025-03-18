@@ -193,6 +193,20 @@ namespace validate {
     return handler;
   }
 
+  /**
+   * Validate a value that matches at least one of the {@link schemas}
+   *
+   * The target value of this validator is the union of the target values of all {@link schemas}
+   *
+   * @example
+   * validate(3, validate.either(Number, String)); // Ok: number | string
+   * validate("abc", validate.either(Number, String)); // Ok: number | string
+   * validate(null, validate.either(Number, String)); // Error
+   *
+   * validate("user", validate.either("user", "admin")); // Ok: "user" | "admin"
+   * validate("admin", validate.either("user", "admin")); // Ok: "user" | "admin"
+   * validate("non existing role", validate.either("user", "admin")); // Error
+   */
   export function either<S extends Schema[]>(...schemas: S): (value: unknown, path: (string | number)[]) => TupleToUnion<{ [K in keyof S]: SchemaToValue<S[K]> }> {
     return customValidator((value, path, validator) => {
       for (const schema of schemas) {
