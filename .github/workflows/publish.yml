@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: Bump the project version then publish to npm
+        description: Release type
         required: true
         default: patch
         type: choice
@@ -13,7 +13,7 @@ on:
           - minor
           - major
       dry_run:
-        description: Do not make any change, for debugging purposes
+        description: Dry run
         required: true
         default: false
         type: boolean
