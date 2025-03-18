@@ -44,9 +44,9 @@ jobs:
         run: git tag "v$(npm pkg get version | tr -d '"')"
       - name: Push changes
         run: |
-          git push ${{ inputs.dry_run && '--dry-run' }} --tags origin
-          git push ${{ inputs.dry_run && '--dry-run' }}
+          git push ${{ inputs.dry_run ? '--dry-run' : '' }} --tags origin
+          git push ${{ inputs.dry_run ? '--dry-run' : '' }}
       - name: Publish to npm
-        run: npm publish ${{ inputs.dry_run && '--dry-run' }} --provenance --access public
+        run: npm publish ${{ inputs.dry_run ? '--dry-run' : '' }} --provenance --access public
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
