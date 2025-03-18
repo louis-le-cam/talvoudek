@@ -353,7 +353,7 @@ namespace validate {
         }
       }
 
-      return "custom_validator"
+      return "custom_validator";
     } else {
       return "unknown";
     }

@@ -82,3 +82,18 @@ test("extra object field", () => {
     },
   )).toThrow(new validate.ValidationError(["body", "extraField"], undefined, null));
 });
+
+test("not object", () => {
+  expect(() => validate(
+    null,
+    {
+      name: String,
+      age: Number,
+      role: validate.either("user", "admin")
+    },
+  )).toThrow(new validate.ValidationError(["body"], {
+      name: String,
+      age: Number,
+      role: validate.either("user", "admin")
+    }, null));
+});
