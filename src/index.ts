@@ -526,12 +526,18 @@ namespace validate {
     : S extends null ? null
     : never;
 
+  /**
+   * Convert a tuple type with shape `[A, B, ...]` into a union type with shape `A | B | ...`
+   */
   export type TupleToUnion<T> = T extends { [K: number]: unknown } ? T[number] : never;
+  /**
+   * Convert a tuple type with shape `[A, B, ...]` into a intersection type with shape `A & B & ...`
+   */
   export type TupleToIntersection<T> = {
     [K in keyof T]: (x: T[K]) => void
   } extends {
     [K: number]: (x: infer I) => void
-  } ? I : never
+  } ? I : never;
 }
 
 export default validate;
