@@ -1,8 +1,8 @@
 import validate from "../src";
 
-class Foo {}
+class Foo { }
 
-class Bar {}
+class Bar { }
 
 test("good instanceOf", () => {
   expect(validate(new Foo(), validate.instanceOf(Foo))).toBeInstanceOf(Foo);
