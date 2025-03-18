@@ -169,6 +169,23 @@ namespace validate {
     }
   }
 
+  /**
+   * Creates a custom validator with metadata attached to it,
+   *
+   * This function is not necessary to create a custom validator,
+   * it just allows to attach metadata that will be used in error message,
+   * it is recommanded to create custom validators this way.
+   *
+   * @example
+   * const customValidator = validate.customValidator((value, path, validator) => {
+   *     if (typeof value !== "string" || value.length < 8) {
+   *       throw new validate.ValidationError(path, customValidator, value);
+   *     }
+   *
+   *     return value;
+   *   }, new validator.CustomMetadata("password(length >= 8)")
+   * );
+   */
   export function customValidator<
     V extends (value: unknown, path: (string | number)[], validator: (value: unknown, path: (string | number)[]) => T) => T,
     T
