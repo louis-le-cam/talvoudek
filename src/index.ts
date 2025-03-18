@@ -157,7 +157,7 @@ namespace validate {
    *   { [validate.customMetadataSymbol]: new validate.CustomMetadata("customValidator") }
    * );
    */
-  class CustomMetadata {
+  export class CustomMetadata {
     public readonly name: string;
     public readonly schemas?: Schema[];
     public readonly separator: string;
