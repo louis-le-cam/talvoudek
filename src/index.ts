@@ -138,7 +138,7 @@ namespace validate {
    *   { [validate.customMetadataSymbol]: new validate.CustomMetadata("customValidator") }
    * );
    */
-  export const customMetadataSymbol = Symbol();
+  const customMetadataSymbol = Symbol();
 
   /**
    * Class for attaching metadata on custom validator functions for displaying purposes
@@ -157,7 +157,7 @@ namespace validate {
    *   { [validate.customMetadataSymbol]: new validate.CustomMetadata("customValidator") }
    * );
    */
-  export class CustomMetadata {
+  class CustomMetadata {
     public readonly name: string;
     public readonly schemas?: Schema[];
     public readonly separator: string;
@@ -170,25 +170,37 @@ namespace validate {
   }
 
   export function either<S extends Schema[]>(...schemas: S): (value: unknown, path: (string | number)[]) => TupleToUnion<{ [K in keyof S]: SchemaToValue<S[K]> }> {
-    const handler = Object.assign(
-      (value: unknown, path: (string | number)[]) => {
-        for (const schema of schemas) {
-          try {
-            return validate(value, schema, path);
-          } catch (err) {
-            if (!(err instanceof Error)) {
-              throw err;
-            }
+    return customValidator((value, path, validator) => {
+      for (const schema of schemas) {
+        try {
+          return validate(value, schema, path);
+        } catch (err) {
+          if (!(err instanceof ValidationError)) {
+            throw err;
           }
         }
+      }
 
-        throw new ValidationError(path, handler, value);
+      throw new ValidationError(path, validator, value);
+    }, new CustomMetadata("either", schemas, " | "));
+  };
+
+  export function customValidator<
+    V extends (value: unknown, path: (string | number)[], validator: (value: unknown, path: (string | number)[]) => T) => T,
+    T
+  >(
+    validator: V,
+    metadata: CustomMetadata = new CustomMetadata()
+  ): ((value: unknown, path: (string | number)[]) => T) & { [customMetadataSymbol]: CustomMetadata } {
+    const handler = Object.assign(
+      (value: unknown, path: (string | number)[]) => {
+        return validator(value, path, handler);
       },
-      { [customMetadataSymbol]: new CustomMetadata("either", schemas, " | ") },
+      { [customMetadataSymbol]: metadata },
     );
 
     return handler;
-  };
+  }
 
   /**
    * @deprecated currently this function may produce invalid behaviour
@@ -200,18 +212,13 @@ namespace validate {
    * see {@link Schema} for an example of a custom validator
    */
   export function all<S extends Schema[]>(...schemas: S): (value: unknown, path: (string | number)[]) => TupleToIntersection<{ [K in keyof S]: SchemaToValue<S[K]> }> {
-    const handler = Object.assign(
-      (value: unknown, path: (string | number)[]) => {
-        for (const schema of schemas) {
-          value = validate(value, schema, path);
-        }
+    return customValidator((value, path) => {
+      for (const schema of schemas) {
+        value = validate(value, schema, path);
+      }
 
-        return value as TupleToIntersection<{ [K in keyof S]: SchemaToValue<S[K]> }>;
-      },
-      { [validate.customMetadataSymbol]: new validate.CustomMetadata("all", schemas, " & ") },
-    );
-
-    return handler;
+      return value as TupleToIntersection<{ [K in keyof S]: SchemaToValue<S[K]> }>;
+    }, new CustomMetadata("all", schemas, " & "));
   };
 
   /**
@@ -224,16 +231,13 @@ namespace validate {
    * validate(Number.MAX_SAFE_INTEGER + 1, validate.safeInteger); // Error
    * validate(-242889244, validate.safeInteger); // Ok
    */
-  export const safeInteger = Object.assign(
-    (value: unknown, path: (string | number)[]): number => {
-      if (typeof value === "number" && Number.isSafeInteger(value)) {
-        return value;
-      } else {
-        throw new validate.ValidationError(path, validate.safeInteger, value);
-      }
-    },
-    { [validate.customMetadataSymbol]: new validate.CustomMetadata("safeInteger") },
-  );
+  export const safeInteger = customValidator((value, path, validator) => {
+    if (typeof value === "number" && Number.isSafeInteger(value)) {
+      return value;
+    } else {
+      throw new validate.ValidationError(path, validator, value);
+    }
+  }, new CustomMetadata("safeInteger"));
 
   /**
    * Validate an object using `instanceof` operator
@@ -249,20 +253,15 @@ namespace validate {
    */
   export function instanceOf<
     C extends { [Symbol.hasInstance]: (instance: unknown) => boolean, name?: string }
-      & (abstract new (...args: any) => any)
+    & (abstract new (...args: any) => any),
   >(clss: C) {
-    const handler = Object.assign(
-      (value: unknown, path: (string | number)[]): InstanceType<C> => {
-        if (value instanceof clss) {
-          return value;
-        } else {
-          throw new validate.ValidationError(path, handler, value);
-        }
-      },
-      { [validate.customMetadataSymbol]: new validate.CustomMetadata(`instanceOf(${clss.name ?? clss.toString()})`) }
-    );
-
-    return handler;
+    return customValidator((value, path, validator) => {
+      if (value instanceof clss) {
+        return value;
+      } else {
+        throw new validate.ValidationError(path, validator, value);
+      }
+    }, new CustomMetadata(`instanceOf(${clss.name ?? clss.toString()})`));
   };
 
   /**
@@ -321,15 +320,15 @@ namespace validate {
         },\n`
       ).join("")}${" ".repeat(identation)}}`;
     } else if (typeof schema === "function") {
-      if (validate.customMetadataSymbol in schema) {
+      if (customMetadataSymbol in schema) {
         // @ts-ignore: why you can't get by symbols in typescript ???
-        const metadata = schema[validate.customMetadataSymbol];
+        const metadata = schema[customMetadataSymbol];
 
-        if (metadata instanceof validate.CustomMetadata) {
+        if (metadata instanceof CustomMetadata) {
           return `${metadata.name}${metadata.schemas === undefined ? "" : `(${metadata.schemas
             .map(schema => prettySchema(schema, identationIncrement, identation))
             .join(metadata.separator)
-          })`}`;
+            })`}`;
         }
       }
 
