@@ -82,5 +82,3 @@ test("extra object field", () => {
     },
   )).toThrow(new validate.ValidationError(["body", "extraField"], undefined, null));
 });
-
-
