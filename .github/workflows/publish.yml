@@ -12,6 +12,11 @@ on:
           - patch
           - minor
           - major
+      dry_run:
+        description: Do not make any change, for debugging purposes
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   publish:
@@ -39,9 +44,9 @@ jobs:
         run: git tag "v$(npm pkg get version | tr -d '"')"
       - name: Push changes
         run: |
-          git push --tags origin
-          git push
+          git push ${{ inputs.dry_run && "--dry-run" }} --tags origin
+          git push ${{ inputs.dry_run && "--dry-run" }}
       - name: Publish to npm
-        run: npm publish --provenance --access public
+        run: npm publish ${{ inputs.dry_run && "--dry-run" }} --provenance --access public
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
