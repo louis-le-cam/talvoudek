@@ -143,19 +143,9 @@ namespace validate {
   /**
    * Class for attaching metadata on custom validator functions for displaying purposes
    *
-   * This value should be attached with the {@link validate.CustomMetadataSymbol} symbol
+   * This value should be attached with the {@link customMetadataSymbol} symbol
    *
-   * @example
-   * const customValidator = Object.assign(
-   *   (value: unknown, path: (string | number)[]): string => {
-   *     if (typeof value !== "string" || value.length < 8) {
-   *       throw new validate.ValidationError(path, customValidator, value);
-   *     }
-   * 
-   *     return value;
-   *   },
-   *   { [validate.customMetadataSymbol]: new validate.CustomMetadata("customValidator") }
-   * );
+   * see {@link customValidator}
    */
   export class CustomMetadata {
     public readonly name: string;
