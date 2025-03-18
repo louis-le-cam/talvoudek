@@ -169,22 +169,6 @@ namespace validate {
     }
   }
 
-  export function either<S extends Schema[]>(...schemas: S): (value: unknown, path: (string | number)[]) => TupleToUnion<{ [K in keyof S]: SchemaToValue<S[K]> }> {
-    return customValidator((value, path, validator) => {
-      for (const schema of schemas) {
-        try {
-          return validate(value, schema, path);
-        } catch (err) {
-          if (!(err instanceof ValidationError)) {
-            throw err;
-          }
-        }
-      }
-
-      throw new ValidationError(path, validator, value);
-    }, new CustomMetadata("either", schemas, " | "));
-  };
-
   export function customValidator<
     V extends (value: unknown, path: (string | number)[], validator: (value: unknown, path: (string | number)[]) => T) => T,
     T
@@ -201,6 +185,22 @@ namespace validate {
 
     return handler;
   }
+
+  export function either<S extends Schema[]>(...schemas: S): (value: unknown, path: (string | number)[]) => TupleToUnion<{ [K in keyof S]: SchemaToValue<S[K]> }> {
+    return customValidator((value, path, validator) => {
+      for (const schema of schemas) {
+        try {
+          return validate(value, schema, path);
+        } catch (err) {
+          if (!(err instanceof ValidationError)) {
+            throw err;
+          }
+        }
+      }
+
+      throw new ValidationError(path, validator, value);
+    }, new CustomMetadata("either", schemas, " | "));
+  };
 
   /**
    * @deprecated currently this function may produce invalid behaviour
