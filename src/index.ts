@@ -243,6 +243,36 @@ namespace validate {
   };
 
   /**
+   * Validate any value without any checking
+   *
+   * A safer alternative is {@link unknown} since typescript will
+   * block you from using it without further checking
+   *
+   * @example
+   * validate(4, validate.any); // Ok
+   * validate("some string", validate.any); // Ok
+   * validate({ testField: false }, validate.any); // Ok
+   * validate([92], validate.any); // Ok
+   */
+  export const any = customValidator((value, _path, _validator) => {
+    return value as any;
+  }, new CustomMetadata("safeInteger"));
+
+
+  /**
+   * Validate any value without any checking
+   *
+   * @example
+   * validate(4, validate.unknown); // Ok
+   * validate("some string", validate.unknown); // Ok
+   * validate({ testField: false }, validate.unknown); // Ok
+   * validate([92], validate.unknown); // Ok
+   */
+  export const unknown = customValidator((value, _path, _validator) => {
+    return value;
+  }, new CustomMetadata("safeInteger"));
+
+  /**
    * Validate a number that is an integer in the safe integer range,
    * see {@link Number.isSafeInteger} for more information on safe integers
    *
