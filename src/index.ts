@@ -243,6 +243,32 @@ namespace validate {
   };
 
   /**
+   * Validate a value that matches at least one of the {@link schemas}
+   *
+   * The target value of this validator is the union of the target values of all {@link schemas}
+   *
+   * @example
+   * validate(3, validate.either(Number, String)); // Ok: number | string
+   * validate("abc", validate.either(Number, String)); // Ok: number | string
+   * validate(null, validate.either(Number, String)); // Error
+   *
+   * validate("user", validate.either("user", "admin")); // Ok: "user" | "admin"
+   * validate("admin", validate.either("user", "admin")); // Ok: "user" | "admin"
+   * validate("non existing role", validate.either("user", "admin")); // Error
+   */
+  export function allowExtraFields<S extends { [K in string]: Schema }>(object: S): (value: unknown, path: (string | number)[]) => SchemaToValue<S> {
+    return customValidator((value, path, validator) => {
+      if (typeof value !== "object" || Array.isArray(value) || value === null) {
+        throw new ValidationError(path, validator, value);
+      }
+
+      return Object.fromEntries(Object.entries(object).map(
+          ([key, schema]) => [key, validate((value as any)[key], schema, [...path, key])]
+      )) as SchemaToValue<S>;
+    }, new CustomMetadata("allowExtraFields", [object]));
+  };
+
+  /**
    * Validate any value without any checking
    *
    * A safer alternative is {@link unknown} since typescript will
