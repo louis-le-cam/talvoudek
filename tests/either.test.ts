@@ -8,7 +8,6 @@ test("expected number or string got string", () => {
   expect(validate("dhiqzd", validate.either(Number, String))).toBe("dhiqzd");
 });
 
-
 test("expected number or string got null", () => {
   expect(() => validate(null, validate.either(Number, String)))
     .toThrow(new validate.ValidationError(["body"], validate.either(Number, String), null));
