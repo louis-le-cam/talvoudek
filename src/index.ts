@@ -455,6 +455,31 @@ namespace validate {
   }, new CustomMetadata("bigIntString"));
 
   /**
+   * Parse a date from a string using the {@link Date} constructor
+   *
+   * The only format that {@link Date} constructor is guaranteed to parse is the following:
+   * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format}
+   *
+   * @example
+   * validate("1970-01-01T00:00:00Z", validate.parseDate); // Ok
+   * validate("2020-03-14", validate.parseDate); // Ok
+   * validate(new Date(), validate.parseDate); // Error
+   * validate(8, validate.parseDate); // Error
+   */
+  export const parseDate = customValidator<Date>((value, path, validator) => {
+    if (typeof value !== "string") {
+      throw new validate.ValidationError(path, validator, value);
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      throw new validate.ValidationError(path, validator, value);
+    }
+
+    return date;
+  }, new CustomMetadata("dateString"));
+
+  /**
    * Format a field path into a string displayable to end-users
    *
    * The result of this function should be safe to display as long as the field names and indices of the value
