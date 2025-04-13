@@ -260,7 +260,7 @@ namespace validate {
       }
 
       return Object.fromEntries(Object.entries(object).map(
-          ([key, schema]) => [key, validate((value as any)[key], schema, [...path, key])]
+        ([key, schema]) => [key, validate((value as any)[key], schema, [...path, key])]
       )) as SchemaToValue<S>;
     }, new CustomMetadata("allowExtraFields", [object]));
   };
@@ -312,7 +312,7 @@ namespace validate {
       throw new validate.ValidationError(path, validator, value);
     }
   }, new CustomMetadata("safeInteger"));
-  
+
   /**
    * Validate an object using `instanceof` operator
    *
@@ -337,6 +337,122 @@ namespace validate {
       }
     }, new CustomMetadata(`instanceOf(${clss.name ?? clss.toString()})`));
   };
+
+  /**
+   * Parse an integer from a string using {@link Number} function
+   *
+   * The input value must be a string, and must follow one of the formats parsed by {@link BigInt} function
+   *
+   * The output number might be rounded if it's outside of range {@link Number.MIN_SAFE_INTEGER}..={@link Number.MAX_SAFE_INTEGER}
+   *
+   * see {@link parseFloat} to parse decimal points numbers
+   * see {@link parseSafeInteger} to parse integer within the safe integer range (see {@link Number.isSafeInteger})
+   * see {@link parseBigInt} to precisely parse large integers
+   *
+   * @example
+   * validate("4", validate.parseInt); // Ok
+   * validate("4.5", validate.parseInt); // Error
+   * validate(8, validate.parseInt); // Error
+   * validate("-242889244", validate.parseInt); // Ok
+   */
+  export const parseInt = customValidator<number>((value, path, validator) => {
+    if (typeof value !== "string") {
+      throw new validate.ValidationError(path, validator, value);
+    }
+
+    try {
+      BigInt(Number.MAX_SAFE_INTEGER);
+    } catch {
+      throw new validate.ValidationError(path, validator, value);
+    }
+
+    return Number(value);
+  }, new CustomMetadata("intString"));
+
+  /**
+   * Parse an integer from a string using {@link Number} function
+   *
+   * The input value must be a string, and must follow one of the formats parsed by {@link BigInt} function
+   *
+   * The number must be in range {@link Number.MIN_SAFE_INTEGER}..={@link Number.MAX_SAFE_INTEGER}
+   *
+   * see {@link parseFloat} to parse decimal points numbers
+   * see {@link parseBigInt} to precisely parse large integers
+   *
+   * @example
+   * validate("4", validate.parseSafeInteger); // Ok
+   * validate("4.5", validate.parseSafeInteger); // Error
+   * validate(8, validate.parseSafeInteger); // Error
+   * validate("-242889244", validate.parseSafeInteger); // Ok
+   * validate((Number.MAX_SAFE_INTEGER + 1).toString(), validate.parseSafeInteger); // Error
+   */
+  export const parseSafeInteger = customValidator<number>((value, path, validator) => {
+    if (typeof value !== "string") {
+      throw new validate.ValidationError(path, validator, value);
+    }
+
+    try {
+      if (BigInt(Number.MAX_SAFE_INTEGER) > BigInt(value)) {
+        throw new validate.ValidationError(path, validator, value);
+      }
+    } catch {
+      throw new validate.ValidationError(path, validator, value);
+    }
+
+    return Number(value);
+  }, new CustomMetadata("safeIntegerString"));
+
+  /**
+   * Parse an floating point number from a string using {@link Number} function
+   *
+   * The input value must be a string, and must follow one of the formats parsed by {@link Number} function
+   *
+   * see {@link parseSafeInteger} to parse integer within the safe integer range (see {@link Number.isSafeInteger})
+   * see {@link parseBigInt} to precisely parse large integers
+   *
+   * @example
+   * validate("4", validate.parseFloat); // Ok
+   * validate("4.5", validate.parseFloat); // Ok
+   * validate(8, validate.parseFloat); // Error
+   * validate("-242889244", validate.parseFloat); // Ok
+   * validate(-83, validate.parseFloat); // Error
+   */
+  export const parseFloat = customValidator<number>((value, path, validator) => {
+    if (typeof value !== "string") {
+      throw new validate.ValidationError(path, validator, value);
+    }
+
+    return Number(value);
+  }, new CustomMetadata("floatString"));
+
+  /**
+   * Parse an integer from a string using {@link BigInt} function
+   *
+   * The input value must be a string, and must follow one of the formats parsed by {@link BigInt} function
+   *
+   * {@link BigInt} allow to precisely store integer larger than {@link Number} can store.
+   *
+   * see {@link parseSafeInteger} to parse integer within the safe integer range (see {@link Number.isSafeInteger})
+   * see {@link parseFloat} to parse decimal points numbers
+   *
+   * @example
+   * validate("4", validate.parseBigInt); // Ok
+   * validate("4.5", validate.parseBigInt); // Error
+   * validate(8, validate.parseBigInt); // Error
+   * validate("-242889244", validate.parseBigInt); // Ok
+   * validate((Number.MAX_SAFE_INTEGER + 1).toString(), validate.parseBigInt); // Ok
+   */
+  export const parseBigInt = customValidator<bigint>((value, path, validator) => {
+    if (typeof value !== "string") {
+      throw new validate.ValidationError(path, validator, value);
+    }
+
+    try {
+      return BigInt(value);
+    } catch {
+      throw new validate.ValidationError(path, validator, value);
+    }
+  }, new CustomMetadata("bigIntString"));
 
   /**
    * Format a field path into a string displayable to end-users
