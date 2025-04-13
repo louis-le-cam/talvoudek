@@ -176,11 +176,8 @@ namespace validate {
    *   }, new validator.CustomMetadata("password(length >= 8)")
    * );
    */
-  export function customValidator<
-    V extends (value: unknown, path: (string | number)[], validator: (value: unknown, path: (string | number)[]) => T) => T,
-    T
-  >(
-    validator: V,
+  export function customValidator<T>(
+    validator: (value: unknown, path: (string | number)[], validator: (value: unknown, path: (string | number)[]) => T) => T,
     metadata: CustomMetadata = new CustomMetadata()
   ): ((value: unknown, path: (string | number)[]) => T) & { [customMetadataSymbol]: CustomMetadata } {
     const handler = Object.assign(
@@ -280,8 +277,8 @@ namespace validate {
    * validate({ testField: false }, validate.any); // Ok
    * validate([92], validate.any); // Ok
    */
-  export const any = customValidator((value, _path, _validator) => {
-    return value as any;
+  export const any = customValidator<any>((value, _path, _validator) => {
+    return value;
   }, new CustomMetadata("safeInteger"));
 
 
@@ -294,7 +291,7 @@ namespace validate {
    * validate({ testField: false }, validate.unknown); // Ok
    * validate([92], validate.unknown); // Ok
    */
-  export const unknown = customValidator((value, _path, _validator) => {
+  export const unknown = customValidator<unknown>((value, _path, _validator) => {
     return value;
   }, new CustomMetadata("safeInteger"));
 
@@ -308,14 +305,14 @@ namespace validate {
    * validate(Number.MAX_SAFE_INTEGER + 1, validate.safeInteger); // Error
    * validate(-242889244, validate.safeInteger); // Ok
    */
-  export const safeInteger = customValidator((value, path, validator) => {
+  export const safeInteger = customValidator<number>((value, path, validator) => {
     if (typeof value === "number" && Number.isSafeInteger(value)) {
       return value;
     } else {
       throw new validate.ValidationError(path, validator, value);
     }
   }, new CustomMetadata("safeInteger"));
-
+  
   /**
    * Validate an object using `instanceof` operator
    *
@@ -331,7 +328,7 @@ namespace validate {
   export function instanceOf<
     C extends { [Symbol.hasInstance]: (instance: unknown) => boolean, name?: string }
     & (abstract new (...args: any) => any),
-  >(clss: C) {
+  >(clss: C): (value: unknown, path: (string | number)[]) => InstanceType<C> {
     return customValidator((value, path, validator) => {
       if (value instanceof clss) {
         return value;
